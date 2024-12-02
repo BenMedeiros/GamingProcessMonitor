@@ -1,5 +1,3 @@
-
-
 function Start-CPUMonitor {
     param (
         [string]$FilePath
@@ -10,16 +8,15 @@ function Start-CPUMonitor {
         New-Item -ItemType File -Path $FilePath -Force
     }
 
-    $cpuCounter = Get-Counter '\Processor(_Total)\% Processor Time'
-
-    for ($i = 0; $i -lt 30; $i++) {
+    for ($i = 0; $i -lt 3; $i++) {
+        # You can only get one sample max per second with SampleInterval.  Pretty dumb.
+        $cpuCounter = Get-Counter '\Processor(_Total)\% Processor Time' -MaxSamples 1 -SampleInterval 1
         $cpuUsage = $cpuCounter.CounterSamples.CookedValue
         $timestamp = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
         "$timestamp - CPU Usage: $cpuUsage%" | Out-File -FilePath $FilePath -Append
-        Start-Sleep -Seconds 1
-        $cpuCounter = Get-Counter '\Processor(_Total)\% Processor Time'
-    }
+        Write-Output "$timestamp - CPU Usage: $cpuUsage%"
+        # Start-Sleep -Milliseconds 10
+    }   
 }
-
 
 Export-ModuleMember -Function Start-CPUMonitor
