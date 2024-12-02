@@ -1,17 +1,4 @@
-function TESTTEST {
-    param (
-        
-    )
-    
-    "TESTTEST"  
-}
 
-function Get-Greeting182347 {
-    param (
-        [string]$Name
-    )
-    "Hello, $Name"
-}
 
 function Start-CPUMonitor {
     param (
@@ -34,13 +21,5 @@ function Start-CPUMonitor {
     }
 }
 
-function Write-Test-Message-3 {
-    param (
-        
-    )
 
-    "Test MSG"
-    
-}
-
-Export-ModuleMember -Function Get-Greeting182347, Start-CPUMonitor, Write-Test-Message-3, TESTTEST
+Export-ModuleMember -Function Start-CPUMonitor

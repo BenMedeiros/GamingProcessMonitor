@@ -1,11 +1,25 @@
-"root:"
-"$PSScriptRoot"
+Write-Output "Running GamingProcessMonitor.ps1 from: "
+Write-Output "$PSScriptRoot"
+Write-Output ""
 
-$env:PSModulePath += ";$PSScriptRoot\Modules"
-"`n"
-Write-Output "PSModulePath: $env:PSModulePath"
+if ($env:PSModulePath -notmatch [regex]::Escape("$PSScriptRoot\Modules")) {
+    Write-Output "Adding module path to PSModulePath"
+    Write-Output ""
+    $env:PSModulePath += ";$PSScriptRoot\Modules"
+}else{
+    Write-Output "Module path already in PSModulePath"
+    Write-Output ""
+}
 
-Remove-Module MyModule
+
+Write-Output "PSModulePath: "
+Write-Output "$env:PSModulePath"
+Write-Output ""
+
+# if (Get-Module -Name MyModule) {
+#     Write-Output "Removing existing MyModule"
+#     Remove-Module MyModule
+# }
 Import-Module "$PSScriptRoot\Modules\MyModule" -Force
 
 Import-Module "$PSScriptRoot\Modules\MyModule"
