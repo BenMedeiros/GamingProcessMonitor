@@ -16,19 +16,40 @@ $watcher.NotifyFilter = [System.IO.NotifyFilters]::LastWrite
 # Register event handler for file changed event
 $sourceIdentifier = "FileChangedEvent"
 Write-Host "Registering event with SourceIdentifier: $sourceIdentifier"
+
+# Unfortunatly, this event gets called twice by Powershell
 $changedEventHandler = Register-ObjectEvent $watcher "Changed" -SourceIdentifier $sourceIdentifier -Action {
     Write-Host "File Changed: "
     
+    # Update the ModuleVersion in the MyModule.psd1 file
     function Update-ModuleVersion {
         param (
             [string]$filePath
         )
 
-        Write-Host "Updating ModuleVersion to ModuleVersioning in file: $filePath"
+        Write-Host "Updating ModuleVersion to ModuleVersioning in file: "
+        Write-Host $filePath
         $content = Get-Content -Path $filePath
-        $newContent = $content -replace 'ModuleVersion', 'ModuleVersioning'
-        Set-Content -Path $filePath -Value $newContent
-        Write-Host "Updated ModuleVersion to ModuleVersioning in the file."
+
+        $contentLines = $content -split "`r`n"
+        foreach ($line in $contentLines) {
+            if ($line.Trim().StartsWith('ModuleVersion')) {
+                $lineSplit1 = $line.Split("'")
+                $lineSplit2 = $lineSplit1[1].Split(".")
+                
+                $patchVersion = $lineSplit2[2]
+                $patchVersion = [int]$patchVersion + 1
+                $lineSplit2[2] = $patchVersion
+                $lineSplit1[1] = $lineSplit2 -join "."
+                $rebuiltLine = $lineSplit1 -join "'"
+                
+                Write-Host "patchVersion: $patchVersion"
+                Write-Host "rebuiltLine: $rebuiltLine"
+                $content = $content -replace $line, $rebuiltLine
+            }
+        }
+        
+        Set-Content -Path $filePath -Value $content
     }
 
     $resolvedFilePath = (Resolve-Path -Path "$PSScriptRoot\..\Modules\MyModule\MyModule.psd1").Path
