@@ -19,7 +19,7 @@ Write-Host "Registering event with SourceIdentifier: $sourceIdentifier"
 $changedEventHandler = Register-ObjectEvent $watcher "Changed" -SourceIdentifier $sourceIdentifier -Action {
     Write-Host "File Changed: "
     
-    function Increment-ModuleVersion {
+    function Update-ModuleVersion {
         param (
             [string]$filePath
         )
