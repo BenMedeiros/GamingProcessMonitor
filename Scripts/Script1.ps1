@@ -1,4 +1,42 @@
-Import-Module -Name "$PSScriptRoot/../Modules/MyModule" -Verbose
+# Specify the directory to watch
+$directoryToWatch = "$PSScriptRoot\..\Data"
+$fileToWatch = "cpu_usage_per_core_log.txt"
 
-# List available commands in the module to verify the function is exported
-Get-Command -Module MyModule
+# Resolve the directory path
+$resolvedDirectoryToWatch = (Resolve-Path -Path $directoryToWatch).Path
+Write-Host "Resolved directory to watch: $resolvedDirectoryToWatch"
+
+# Create a new FileSystemWatcher instance
+$watcher = New-Object System.IO.FileSystemWatcher $resolvedDirectoryToWatch
+
+# Set the filter to monitor the specific file
+$watcher.Filter = $fileToWatch
+$watcher.NotifyFilter = [System.IO.NotifyFilters]::LastWrite
+
+# Register event handler for file changed event
+$sourceIdentifier = "FileChangedEvent"
+Write-Host "Registering event with SourceIdentifier: $sourceIdentifier"
+$changedEventHandler = Register-ObjectEvent $watcher "Changed" -SourceIdentifier $sourceIdentifier -Action {
+    Write-Host "File Changed: $($Event.SourceEventArgs.FullPath)"
+}
+
+# Begin monitoring the directory
+$watcher.EnableRaisingEvents = $true
+Write-Host "Started monitoring file changes for: $resolvedDirectoryToWatch\$fileToWatch"
+
+# Keep the script running
+Write-Host "Monitoring file changes. Press [Enter] to exit."
+while ($true) {
+    if ([System.Console]::KeyAvailable) {
+        $null = [System.Console]::ReadLine()
+        break
+    }
+    Start-Sleep -Seconds 1
+}
+
+# Unregister the event and dispose the watcher when done
+Write-Host "Unregistering event with SourceIdentifier: $sourceIdentifier"
+Unregister-Event -SourceIdentifier $sourceIdentifier
+$changedEventHandler.Dispose()
+$watcher.Dispose()
+Write-Host "Stopped monitoring file changes."

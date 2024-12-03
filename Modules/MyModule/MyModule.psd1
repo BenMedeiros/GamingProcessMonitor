@@ -3,7 +3,7 @@
     RootModule = 'MyModule.psm1'
 
     # Version number of this module.
-    ModuleVersion = '1.0.4'
+    ModuleVersion = '1.0.6'
 
     # ID used to uniquely identify this module
     GUID = '12345678-1234-1234-1234-123456789012'
@@ -18,7 +18,7 @@
     Description = 'Description of MyModule'
 
     # Functions to export from this module
-    FunctionsToExport = @('Start-CPUMonitor')
+    FunctionsToExport = @('Start-CPUMonitor', 'Start-CPUMonitor-PerCore')
 
     # Cmdlets to export from this module
     CmdletsToExport = @()
