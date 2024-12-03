@@ -24,30 +24,15 @@ $changedEventHandler = Register-ObjectEvent $watcher "Changed" -SourceIdentifier
             [string]$filePath
         )
 
-        Write-Host "Incrementing ModuleVersion in file: $filePath"
+        Write-Host "Updating ModuleVersion to ModuleVersioning in file: $filePath"
         $content = Get-Content -Path $filePath
-        $moduleVersionLine = $content | Select-String -Pattern 'ModuleVersion'
-        if ($moduleVersionLine) {
-            Write-Host "ModuleVersion found in the file."
-            $version = $moduleVersionLine -replace '.*?(\d+\.\d+\.\d+\.\d+).*', '$1'
-            $versionParts = $version -split '\.'
-            
-            Write-Host "Current ModuleVersion: $version Parts: $versionParts[0] $versionParts[1] $versionParts[2] $versionParts[3]"
-            $versionPartMinorNum = $versionParts[2] -split ''''
-            $versionPartMinorNum = [int]$versionPartMinorNum[0] + 1
-            $versionParts[2] = $versionPartMinorNum -join ''''
-            $newVersion = $versionParts -join '.'
-            Write-Host "New ModuleVersion: $newVersion"
-            $newContent = $content -replace $version, $newVersion
-            Set-Content -Path $filePath -Value $newContent
-            Write-Host "ModuleVersion incremented to $newVersion"
-        } else {
-            Write-Host "ModuleVersion not found in the file."
-        }
+        $newContent = $content -replace 'ModuleVersion', 'ModuleVersioning'
+        Set-Content -Path $filePath -Value $newContent
+        Write-Host "Updated ModuleVersion to ModuleVersioning in the file."
     }
 
     $resolvedFilePath = (Resolve-Path -Path "$PSScriptRoot\..\Modules\MyModule\MyModule.psd1").Path
-    Increment-ModuleVersion -filePath $resolvedFilePath
+    Update-ModuleVersion -filePath $resolvedFilePath
 }
 
 # Begin monitoring the directory
