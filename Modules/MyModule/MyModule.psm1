@@ -1,6 +1,6 @@
 function Start-CPUMonitor {
     param (
-        [string]$FilePath
+        [string]$FilePath 
     )
 
     # Ensure the file exists
@@ -19,7 +19,7 @@ function Start-CPUMonitor {
     }   
 }
 
-function Start-CPUMonitor-PerCore {
+function Start-CPUMonitorPerCore {
     param (
         [string]$FilePath
     )
@@ -29,18 +29,26 @@ function Start-CPUMonitor-PerCore {
         New-Item -ItemType File -Path $FilePath -Force
     }
 
-    for ($i = 0; $i -lt 3; $i++) {
+    $cpuMonitorActive = $true
+    while($cpuMonitorActive) {
+        if ([System.Console]::KeyAvailable) {
+            $null = [System.Console]::ReadLine()
+            break
+        }
+
         $cpuCounters = Get-Counter '\Processor(*)\% Processor Time' -MaxSamples 1 -SampleInterval 1
-        $timestamp = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
         foreach ($counter in $cpuCounters.CounterSamples) {
             $core = $counter.Path.Split('\')[-2]
-            $cpuUsage = $counter.CookedValue
-            $cpuLogString = "$timestamp - Core $core CPU Usage: $cpuUsage%"
+            $core = $core.Replace("processor(", "").Replace(")", "")
+            $cpuUsage = [math]::Round($counter.CookedValue, 3)
+            $timestamp = $counter.Timestamp
+            $cpuLogString = "$timestamp, $core, $cpuUsage"
             $cpuLogString | Out-File -FilePath $FilePath -Append
             Write-Output $cpuLogString
         }
+
         # Start-Sleep -Milliseconds 10
     }
 }
 
-Export-ModuleMember -Function Start-CPUMonitor, Start-CPUMonitor-PerCore
+Export-ModuleMember -Function Start-CPUMonitor, Start-CPUMonitorPerCore
