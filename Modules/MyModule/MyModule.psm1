@@ -28,33 +28,38 @@ function Start-CPUMonitorPerCore {
     $fileName = "cpu_usage_per_core_log_$timestamp.txt"
     $FilePath = Join-Path -Path $FilePath -ChildPath $fileName
     Write-Output "Creating file: $FilePath"
-# Create new file with timestamp in name
+    # Create new file with timestamp in name
     New-Item -ItemType File -Path $FilePath -Force
     
+    $sampleInterval = 1
+    Write-Output "Sample Interval: $sampleInterval"
+    $dataPointsCollected = 0
     $cpuMonitorActive = $true
-    while($cpuMonitorActive) {
+    while ($cpuMonitorActive) {
         if ([System.Console]::KeyAvailable) {
             $null = [System.Console]::ReadLine()
             break
         }
 
-        $cpuCounters = Get-Counter '\Processor(*)\*','\Memory\*','\GPU Engine(pid_35868*)\*' -MaxSamples 1 -SampleInterval 1
+        $cpuCounters = Get-Counter '\Processor(*)\*', '\Memory\*', '\GPU Engine(pid_35868*)\*' -MaxSamples 1 -SampleInterval $sampleInterval
 
-            if (-not $headers) {
-                $headers = $cpuCounters.CounterSamples | ForEach-Object { $_.Path }
-                $headersString = "Timestamp," + ($headers -join ",")
-                # Remove commas from the headers for CSV
-                $headersString = $headersString -replace ",", ""
-                Write-Output $headersString
-                $headersString | Out-File -FilePath $FilePath -Append -Encoding ascii
-            }
+        if (-not $headers) {
+            $headers = $cpuCounters.CounterSamples | ForEach-Object { $_.Path }
+            $headersString = "Timestamp," + ($headers -join ",")
+            # Remove commas from the headers for CSV
+            $headersString = $headersString -replace ",", ""
+            # Write-Output $headersString
+            $headersString | Out-File -FilePath $FilePath -Append -Encoding ascii
+        }
 
-            $timestamp = $cpuCounters.CounterSamples[0].Timestamp
-            $values = $cpuCounters.CounterSamples | ForEach-Object { $_.CookedValue }
-            $cpuLogString = "$timestamp," + ($values -join ",")
-            $cpuLogString | Out-File -FilePath $FilePath -Append -Encoding ascii
-            Write-Output $cpuLogString
-        
+        $timestamp = $cpuCounters.CounterSamples[0].Timestamp
+        $values = $cpuCounters.CounterSamples | ForEach-Object { $_.CookedValue }
+        $cpuLogString = "$timestamp," + ($values -join ",")
+        $cpuLogString | Out-File -FilePath $FilePath -Append -Encoding ascii
+        # Write-Output $cpuLogString
+        $dataPointsCollected++
+        Write-Output "Data Points Collected: $dataPointsCollected"
+        Write-Output "Press [enter] to stop monitoring..."
         # Start-Sleep -Milliseconds 10
     }
 }
@@ -70,7 +75,7 @@ function Start-GPUMonitor {
     }
 
     $gpuMonitorActive = $true
-    while($gpuMonitorActive) {
+    while ($gpuMonitorActive) {
         if ([System.Console]::KeyAvailable) {
             $null = [System.Console]::ReadLine()
             break
@@ -92,7 +97,7 @@ function Start-GPUMonitor {
 }
 
 
-function Start-MonitorFPS{
+function Start-MonitorFPS {
 
 }
 
