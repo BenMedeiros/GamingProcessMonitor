@@ -1,2 +1,1 @@
-Data/cpu_usage_log.txt
-Data/cpu_usage_per_core_log.txt
+Data/cpu_usage*.txt

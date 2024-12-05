@@ -3,7 +3,7 @@ $directoryToWatch = "$PSScriptRoot\..\Data"
 $fileToWatch = "cpu_usage_per_core_log.txt"
 
 # Resolve the directory path
-$resolvedDirectoryToWatch = (Resolve-Path -Path $directoryToWatch).Path
+$resolvedDirectoryToWatch = (Resolve-Path -Path $directoryToWatch).ProviderPath
 Write-Host "Resolved directory to watch: $resolvedDirectoryToWatch"
 
 # Create a new FileSystemWatcher instance
@@ -17,7 +17,7 @@ $watcher.NotifyFilter = [System.IO.NotifyFilters]::LastWrite
 $sourceIdentifier = "FileChangedEvent"
 Write-Host "Registering event with SourceIdentifier: $sourceIdentifier"
 
-# Unfortunatly, this event gets called twice by Powershell
+# Unfortunately, this event gets called twice by PowerShell
 $changedEventHandler = Register-ObjectEvent $watcher "Changed" -SourceIdentifier $sourceIdentifier -Action {
     Write-Host "File Changed: "
     
@@ -52,7 +52,7 @@ $changedEventHandler = Register-ObjectEvent $watcher "Changed" -SourceIdentifier
         Set-Content -Path $filePath -Value $content
     }
 
-    $resolvedFilePath = (Resolve-Path -Path "$PSScriptRoot\..\Modules\MyModule\MyModule.psd1").Path
+    $resolvedFilePath = (Resolve-Path -Path "$PSScriptRoot\..\Modules\MyModule\MyModule.psd1").ProviderPath
     Update-ModuleVersion -filePath $resolvedFilePath
 }
 

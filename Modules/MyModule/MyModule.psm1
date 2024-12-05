@@ -24,11 +24,13 @@ function Start-CPUMonitorPerCore {
         [string]$FilePath
     )
 
-    # Ensure the file exists
-    if (-not (Test-Path -Path $FilePath)) {
-        New-Item -ItemType File -Path $FilePath -Force
-    }
-
+    $timestamp = Get-Date -Format "yyyy-MM-dd_HHmmss"
+    $fileName = "cpu_usage_per_core_log_$timestamp.txt"
+    $FilePath = Join-Path -Path $FilePath -ChildPath $fileName
+    Write-Output "Creating file: $FilePath"
+# Create new file with timestamp in name
+    New-Item -ItemType File -Path $FilePath -Force
+    
     $cpuMonitorActive = $true
     while($cpuMonitorActive) {
         if ([System.Console]::KeyAvailable) {
@@ -36,15 +38,14 @@ function Start-CPUMonitorPerCore {
             break
         }
 
-        $cpuCounters = Get-Counter '\Processor(*)\% Processor Time' -MaxSamples 1 -SampleInterval 1
-
+        $cpuCounters = Get-Counter '\Processor(*)\*','\Memory\*','\GPU Engine(pid_35868*)\*' -MaxSamples 1 -SampleInterval 1
         foreach ($counter in $cpuCounters.CounterSamples) {
-            $core = $counter.Path.Split('\')[-2]
-            $core = $core.Replace("processor(", "").Replace(")", "")
-            $cpuUsage = [math]::Round($counter.CookedValue, 3)
+            Write-Output $counter
+            $counterPath = $counter.Path
+            $cookedValue = $counter.CookedValue
             $timestamp = $counter.Timestamp
-            $cpuLogString = "$timestamp, $core, $cpuUsage"
-            $cpuLogString | Out-File -FilePath $FilePath -Append
+            $cpuLogString = "$timestamp, $counterPath, $cookedValue"
+            $cpuLogString | Out-File -FilePath $FilePath -Append -Encoding ascii
             Write-Output $cpuLogString
         }
 
@@ -84,6 +85,10 @@ function Start-GPUMonitor {
     }
 }
 
+
+function Start-MonitorFPS{
+
+}
 
 
 Export-ModuleMember -Function Start-CPUMonitor, Start-CPUMonitorPerCore, Start-GPUMonitor
