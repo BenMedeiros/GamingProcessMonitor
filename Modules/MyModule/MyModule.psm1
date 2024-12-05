@@ -39,16 +39,22 @@ function Start-CPUMonitorPerCore {
         }
 
         $cpuCounters = Get-Counter '\Processor(*)\*','\Memory\*','\GPU Engine(pid_35868*)\*' -MaxSamples 1 -SampleInterval 1
-        foreach ($counter in $cpuCounters.CounterSamples) {
-            Write-Output $counter
-            $counterPath = $counter.Path
-            $cookedValue = $counter.CookedValue
-            $timestamp = $counter.Timestamp
-            $cpuLogString = "$timestamp, $counterPath, $cookedValue"
+
+            if (-not $headers) {
+                $headers = $cpuCounters.CounterSamples | ForEach-Object { $_.Path }
+                $headersString = "Timestamp," + ($headers -join ",")
+                # Remove commas from the headers for CSV
+                $headersString = $headersString -replace ",", ""
+                Write-Output $headersString
+                $headersString | Out-File -FilePath $FilePath -Append -Encoding ascii
+            }
+
+            $timestamp = $cpuCounters.CounterSamples[0].Timestamp
+            $values = $cpuCounters.CounterSamples | ForEach-Object { $_.CookedValue }
+            $cpuLogString = "$timestamp," + ($values -join ",")
             $cpuLogString | Out-File -FilePath $FilePath -Append -Encoding ascii
             Write-Output $cpuLogString
-        }
-
+        
         # Start-Sleep -Milliseconds 10
     }
 }
