@@ -27,4 +27,7 @@ Import-Module "$PSScriptRoot\Modules\MyModule"
 Get-Command -Module MyModule
 
 # Start-CPUMonitor -FilePath "$PSScriptRoot\Data\cpu_usage_log.txt"
-Start-CPUMonitorPerCore -FilePath "$PSScriptRoot\Data\cpu_usage_per_core_log.txt"
+
+Start-Job -ScriptBlock {
+    Start-CPUMonitorPerCore -FilePath "$using:PSScriptRoot\Data\cpu_usage_per_core_log.txt"
+}
