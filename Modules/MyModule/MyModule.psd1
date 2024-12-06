@@ -18,7 +18,7 @@
     Description = 'Description of MyModule'
 
     # Functions to export from this module
-    FunctionsToExport = @('Start-CPUMonitor', 'Start-MonitorTypes', 'Start-GPUMonitor')
+    FunctionsToExport = @('Start-CPUMonitor', 'Start-MonitorTypes')
 
     # Cmdlets to export from this module
     CmdletsToExport = @()
