@@ -21,13 +21,21 @@ function Start-CPUMonitor {
 
 function Start-CPUMonitorPerCore {
     param (
-        [string]$FilePath
+        [string]$FilePath,
+        # [ValidateSet('\Processor(*)\*', '\Memory\*', '\GPU Engine(pid_35868*)\*')]
+        [ValidateScript({
+            $_ -like '\Processor(*)\*' -or
+            $_ -like '\Memory\*' -or
+            $_ -like '\GPU Engine(pid_*)\*'
+        })]
+        [string[]]$MonitorTypes
     )
 
     $timestamp = Get-Date -Format "yyyy-MM-dd_HHmmss"
     $fileName = "cpu_usage_per_core_log_$timestamp.txt"
     $FilePath = Join-Path -Path $FilePath -ChildPath $fileName
     Write-Output "Creating file: $FilePath"
+    Write-Output "Monitoring: $MonitorTypes"
     # Create new file with timestamp in name
     New-Item -ItemType File -Path $FilePath -Force
     
@@ -38,16 +46,14 @@ function Start-CPUMonitorPerCore {
     while ($cpuMonitorActive) {
         if ([System.Console]::KeyAvailable) {
             $null = [System.Console]::ReadLine()
-            break
+            break   
         }
 
-        $cpuCounters = Get-Counter '\Processor(*)\*', '\Memory\*', '\GPU Engine(pid_35868*)\*' -MaxSamples 1 -SampleInterval $sampleInterval
+        $cpuCounters = Get-Counter $MonitorTypes -MaxSamples 1 -SampleInterval $sampleInterval
 
         if (-not $headers) {
             $headers = $cpuCounters.CounterSamples | ForEach-Object { $_.Path }
-            $headersString = "Timestamp," + ($headers -join ",")
-            # Remove commas from the headers for CSV
-            $headersString = $headersString -replace ",", ""
+            $headersString = "Timestamp," + ($headers -replace ",", "" -join ",")
             # Write-Output $headersString
             $headersString | Out-File -FilePath $FilePath -Append -Encoding ascii
         }

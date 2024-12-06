@@ -45,14 +45,33 @@ Import-Module "path\to\MyModule.psm1"
 ```ps1
 Start-CPUMonitor -FilePath "path\to\cpu_log.txt"
 ```
+
 2. Start monitoring per-core CPU usage:
 ```ps1
-Start-CPUMonitorPerCore -FilePath "path\to\log\directory"
+Start-CPUMonitorPerCore -FilePath "path\to\log\directory" -MonitorTypes '\Processor(0)\*', '\Memory\system code total bytes', '\GPU Engine(pid_35868*)\*'
 ```
 3. Start monitoring GPU usage:
 ```ps1
 Start-GPUMonitor -FilePath "path\to\gpu_log.txt"
 ```
+
+## Examples
+
+### Example 1: Monitor CPU usage aggregated across all cores
+```ps1
+Start-GPUMonitor -FilePath "$PSScriptRoot\Data" -MonitorTypes '\Processor(_Total)\% Processor Time'
+```
+
+### Example 2: Monitor all CPU performance metrics per core
+```ps1
+Start-CPUMonitorPerCore -FilePath "$PSScriptRoot\Data" -MonitorTypes '\Processor(*)\*'
+```
+
+### Example 3: Monitor tons of stuff, and GPU for PID (otherwise it's too many)
+```ps1
+Start-CPUMonitorPerCore -FilePath "$PSScriptRoot\Data" -MonitorTypes '\Processor(*)\*', '\Memory\*', '\GPU Engine(pid_35868*)\*'
+```
+
 
 ## Contributing
 Contributions are welcome! Please fork the repository and submit a pull request.

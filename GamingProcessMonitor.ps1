@@ -12,22 +12,15 @@ else {
     Write-Output ""
 }
 
-
-Write-Output "PSModulePath: "
-Write-Output "$env:PSModulePath"
-Write-Output ""
-
-# -Force seems to handle this, however I thought I saw different behavior
-# if (Get-Module -Name MyModule) {
-#     Write-Output "Removing existing MyModule"
-#     Remove-Module MyModule
-# }
-Import-Module "$PSScriptRoot\Modules\MyModule" -Force
-
 Import-Module "$PSScriptRoot\Modules\MyModule"
 Get-Command -Module MyModule
 
-# Start-CPUMonitor -FilePath "$PSScriptRoot\Data\cpu_usage_log.txt"
+#Example 1: Monitor CPU usage aggregated across all cores
+# Start-GPUMonitor -FilePath "$PSScriptRoot\Data" -MonitorTypes '\Processor(_Total)\% Processor Time'
 
-Start-CPUMonitorPerCore -FilePath "$PSScriptRoot\Data"
+# Example 2: Monitor all CPU performance metrics per core
+# Start-CPUMonitorPerCore -FilePath "$PSScriptRoot\Data" -MonitorTypes '\Processor(*)\*'
+
+# Main
+Start-CPUMonitorPerCore -FilePath "$PSScriptRoot\Data" -MonitorTypes '\Processor(*)\*', '\Memory\*', '\GPU Engine(pid_35868*)\*'
 
