@@ -1,11 +1,13 @@
 # Gaming Process Monitor
 
 ## Overview
-The Gaming Process Monitor is a PowerShell module designed to monitor CPU usage on a per-core basis. It logs the data to text files for further analysis.
+The Gaming Process Monitor is a PowerShell module designed to monitor CPU usage on a per-core basis. It logs the data to text files for further analysis. Additionally, it includes a KeyLogger and an automatic module version update feature.
 
 ## Features
 - **CPU Monitoring**: Monitor overall CPU usage and per-core usage.
 - **Automatic Logging**: Logs data to timestamped text files.
+- **KeyLogger**: Captures keystrokes and stops monitoring when a specific keyword is typed.
+- **Automatic Module Version Update**: Automatically increments the patch version of the module when changes are detected.
 
 ## Functions
 ### Start-CPUMonitor
