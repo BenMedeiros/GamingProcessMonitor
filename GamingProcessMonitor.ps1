@@ -12,15 +12,15 @@ else {
     Write-Output ""
 }
 
-Import-Module "$PSScriptRoot\Modules\MyModule"
+Import-Module "$PSScriptRoot\Modules\MyModule" -Force
 Get-Command -Module MyModule
 
 #Example 1: Monitor CPU usage aggregated across all cores
-# Start-GPUMonitor -FilePath "$PSScriptRoot\Data" -MonitorTypes '\Processor(_Total)\% Processor Time'
+# Start-MonitorTypes -FilePath "$PSScriptRoot\Data" -MonitorTypes '\Processor(_Total)\% Processor Time'
 
 # Example 2: Monitor all CPU performance metrics per core
-# Start-CPUMonitorPerCore -FilePath "$PSScriptRoot\Data" -MonitorTypes '\Processor(*)\*'
+# Start-MonitorTypes -FilePath "$PSScriptRoot\Data" -MonitorTypes '\Processor(*)\*'
 
 # Main
-Start-CPUMonitorPerCore -FilePath "$PSScriptRoot\Data" -MonitorTypes '\Processor(*)\*', '\Memory\*', '\GPU Engine(pid_35868*)\*'
-
+# Start-MonitorTypes -FilePath "$PSScriptRoot\Data" -MonitorTypes '\Processor(*)\*', '\Memory\*', '\GPU Engine(pid_35868*)\*'
+Start-CPUMonitor -FilePath "$PSScriptRoot\Data"

@@ -3,23 +3,10 @@ function Start-CPUMonitor {
         [string]$FilePath 
     )
 
-    # Ensure the file exists
-    if (-not (Test-Path -Path $FilePath)) {
-        New-Item -ItemType File -Path $FilePath -Force
-    }
-
-    for ($i = 0; $i -lt 3; $i++) {
-        # You can only get one sample max per second with SampleInterval.  Pretty dumb.
-        $cpuCounter = Get-Counter '\Processor(_Total)\% Processor Time' -MaxSamples 1 -SampleInterval 1
-        $cpuUsage = $cpuCounter.CounterSamples.CookedValue
-        $timestamp = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
-        "$timestamp - CPU Usage: $cpuUsage%" | Out-File -FilePath $FilePath -Append
-        Write-Output "$timestamp - CPU Usage: $cpuUsage%"
-        # Start-Sleep -Milliseconds 10
-    }   
+    Start-MonitorTypes -FilePath $FilePath -MonitorTypes '\Processor(_Total)\% Processor Time'
 }
 
-function Start-CPUMonitorPerCore {
+function Start-MonitorTypes {
     param (
         [string]$FilePath,
         # [ValidateSet('\Processor(*)\*', '\Memory\*', '\GPU Engine(pid_35868*)\*')]
@@ -32,7 +19,7 @@ function Start-CPUMonitorPerCore {
     )
 
     $timestamp = Get-Date -Format "yyyy-MM-dd_HHmmss"
-    $fileName = "cpu_usage_per_core_log_$timestamp.txt"
+    $fileName = "performance_monitor_$timestamp.txt"
     $FilePath = Join-Path -Path $FilePath -ChildPath $fileName
     Write-Output "Creating file: $FilePath"
     Write-Output "Monitoring: $MonitorTypes"
@@ -70,10 +57,13 @@ function Start-CPUMonitorPerCore {
     }
 }
 
+
 function Start-GPUMonitor {
     param (
         [string]$FilePath
     )
+   # This function is deprecated and will be removed in a future release. Please use Start-MonitorTypes instead.
+   Write-Warning "The function 'Start-GPUMonitor' is deprecated and will be removed in a future release. Please use 'Start-MonitorTypes' instead."
 
     # Ensure the file exists
     if (-not (Test-Path -Path $FilePath)) {
@@ -102,10 +92,4 @@ function Start-GPUMonitor {
     }
 }
 
-
-function Start-MonitorFPS {
-
-}
-
-
-Export-ModuleMember -Function Start-CPUMonitor, Start-CPUMonitorPerCore, Start-GPUMonitor
+Export-ModuleMember -Function Start-CPUMonitor, Start-MonitorTypes, Start-GPUMonitor
