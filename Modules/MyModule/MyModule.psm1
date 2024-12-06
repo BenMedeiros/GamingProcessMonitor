@@ -29,8 +29,8 @@ function Start-MonitorTypes {
     $sampleInterval = 1
     Write-Output "Sample Interval: $sampleInterval"
     $dataPointsCollected = 0
-    $cpuMonitorActive = $true
-    while ($cpuMonitorActive) {
+    $maxDataPoints = 60
+    while ($dataPointsCollected -lt $maxDataPoints) {
         if ([System.Console]::KeyAvailable) {
             $null = [System.Console]::ReadLine()
             break   

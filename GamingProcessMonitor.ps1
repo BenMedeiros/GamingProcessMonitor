@@ -15,7 +15,11 @@ else {
 Import-Module "$PSScriptRoot\Modules\MyModule" -Force
 Get-Command -Module MyModule
 
-#Example 1: Monitor CPU usage aggregated across all cores
+
+# KeyLogger will run and wait until the user types [help], allowing the rest of the script to continue. Then the monitoring will start.
+./Scripts/KeyLogger.ps1
+
+# Example 1: Monitor CPU usage aggregated across all cores
 # Start-MonitorTypes -FilePath "$PSScriptRoot\Data" -MonitorTypes '\Processor(_Total)\% Processor Time'
 
 # Example 2: Monitor all CPU performance metrics per core
