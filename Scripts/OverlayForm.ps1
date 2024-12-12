@@ -34,15 +34,38 @@ function OnButtonClick {
     [System.Windows.Forms.MessageBox]::Show("Button was clicked!")
 }
 
-function CloseForm {
-    $form.Close()
+function CloseForm($form) {
+    $form.Invoke([action] { $form.Close() })
+}
+
+function ShowForm($form) {
+    $form.ShowDialog()
+}
+
+function UpdateLabelText($label, $newText) {
+    $label.Invoke([action] { $label.Text = $newText })
+}
+
+function SetUpdateTimer($label, $form, [ref]$counter) {
+    $timer = New-Object System.Windows.Forms.Timer
+    $timer.Interval = 1000 # 1 second
+    $timer.Add_Tick({
+        UpdateLabelText $label "Text updated to $($counter.Value)!"
+        $counter.Value = $counter.Value +1
+        CloseForm $form
+    })
+    $timer.Start()
+    return $timer
 }
 
 $form = CreateForm
 $label = CreateLabel
 $button = CreateButton
+$counter = [ref]3
 
 $form.Controls.Add($label)
 $form.Controls.Add($button)
 
-$form.ShowDialog()
+$timer = SetUpdateTimer $label $form $counter
+
+ShowForm $form
