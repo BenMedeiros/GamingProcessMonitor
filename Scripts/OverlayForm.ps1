@@ -51,21 +51,39 @@ function SetUpdateTimer($label, $form, [ref]$counter) {
     $timer.Interval = 1000 # 1 second
     $timer.Add_Tick({
         UpdateLabelText $label "Text updated to $($counter.Value)!"
-        $counter.Value = $counter.Value +1
-        CloseForm $form
+        $counter.Value = $counter.Value + 1
+        Write-Host "Counter: $($counter.Value)"
+        # CloseForm $form
     })
-    $timer.Start()
+   $timer.Start()
     return $timer
 }
 
 $form = CreateForm
 $label = CreateLabel
-$button = CreateButton
+# $dialogButton = CreateButton
 $counter = [ref]3
 
 $form.Controls.Add($label)
-$form.Controls.Add($button)
+# $form.Controls.Add($dialogButton)
 
-$timer = SetUpdateTimer $label $form $counter
+# $timer = SetUpdateTimer $label $form $counter
+$form.Add_FormClosed({ $timer.Stop() })
 
+function CreateLogButton {
+    $logButton = New-Object System.Windows.Forms.Button
+    $logButton.Text = 'Capture Logs'
+    $logButton.Size = New-Object System.Drawing.Size(120, 30)
+    $logButton.Location = New-Object System.Drawing.Point(100, 80)
+    $logButton.BackColor = [System.Drawing.Color]::LightGreen
+    $logButton.ForeColor = [System.Drawing.Color]::DarkGreen
+    $logButton.Font = New-Object System.Drawing.Font('Arial', 10, [System.Drawing.FontStyle]::Bold)
+    $logButton.Add_Click({
+        [System.Windows.Forms.MessageBox]::Show("Logs captured!")
+    })
+    return $logButton
+}
+
+$logButton = CreateLogButton
+$form.Controls.Add($logButton)
 ShowForm $form
